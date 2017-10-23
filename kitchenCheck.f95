@@ -41,6 +41,7 @@ p=(a+b+c)/2
 area=sqrt(p*(p-a)*(p-b)*(p-c))
 print *,"Indicator of difference from the average equilateral: (",sa,",",sb,",",sc,")"
 print *,"Area of working triangle=",area," m^2"
+print *,"Difference ",e
 print *,"Checking dimensions of sizes"
 s(1)=a
 s(2)=b
