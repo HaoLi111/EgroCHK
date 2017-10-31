@@ -1,11 +1,17 @@
 program EgroCHK
 character :: f
-real :: wallheight
+real :: wallheight,sofaWidth,latitute
 print *,"=====         ///// |_| |/"
 print *,"=====/\ |/ /\ \\\\\ | | |\"
 print *,"=====\| |  \/"
 print *,"     _|  "
-print *,"EgroCHK-Egronomic check tool and calculator for design, version 1.0 by Hao Li"
+print *,"EgroCHK_Egronomic check tool and calculator for design, version 1.0 by Hao Li built with FTN95 with Plato IDE"
+!print *,"This is an opensourse program following AGPL license with absolutely no warranty, for more information or to contribute go to"
+print *,"https://github.com/HaoLi111/EgroCHK/tree/Built-executable"
+print *,"k (kitchen check);w (window sunlight design);t (tv and living room dimensions);a (sun angle calculation)"
+!load default value
+wallheight=2.45
+!main panel modifying environmental variables an dcalling subsequences and functions
 do
  print *,"type ? for help; p for a list of program you can run,s for settings,e to exit"
  read *,f
@@ -24,6 +30,7 @@ if (f=="?") then
        print *,"invalid wall height, reset to default"
        wallheight=2.45
    end if
+   print *,"setup: chain&sofa width: type in "
  else if(f=="k") then
    call kitchenCheck()
  else if (f=="w") then
@@ -74,6 +81,9 @@ if (tp==2) then
   c=sqrt((y1-y2)**2+(x1-x2)**2)
   end if
 print *,"(a,b,c)=(",a,",",b,",",c,")"
+if ((a+b)<=c .or. abs(a-b)<=c) then
+  print *,"not a triangle"
+  else
 sa=1.95-a
 sb=1.95-b
 sc=1.95-c
@@ -100,6 +110,7 @@ do i =1,3
     print *,"Side",i,"too long"
   end if
 end do
+end if
 print *,"Check finished,type e to exit,type other keys to go to main menu" 
 read *,aa
 if (aa=="e") stop
@@ -108,6 +119,37 @@ end subroutine kitchenCheck
 !===============================================================================
 subroutine windowCalc(wallheight)
 character :: aa
+real :: t1,t2,wallheight,yup,ylow,yw,yea,yeafromwall,x
+integer :: sel1,sel2,sel3
+print *,"Select input mode 1"
+print *,"1 .Calculate ease from window"
+print *,"2 .Calculate window from ease"
+read *,sel1
+!print *,"Select imput mode 2"
+!print *,"1.Calculate from known sun angle"
+!print *,"2.Calculate from latitute"
+!read *,sel2
+!if (sel2==2) then
+!  call subroutine sunDiag(wallheight)
+  t2=angle(2)
+  t1=angle(4)
+!  else
+    print *,"winter sun deg:"!deg
+    read *,t2
+    print *,"Summer sun deg"
+    read *,t1
+ !   end if
+t2=t2*3.14159/180!rad
+t1=t1*3.14159/180!rad
+if (sel1==1) then !e from w
+  print *,"ylow="
+  print *,"All height wirh respect to"
+  print *,"1.	ground"
+  print *,"2.	walltip"
+  read *,sel3
+  if (sel3==1) then!ground->wall tip
+    end if
+end if
 print *,"Check finished,type e to exit,type other keys to go to main menu" 
 read *,aa
 if (aa=="e") stop
@@ -115,6 +157,7 @@ end subroutine windowCalc
 !===============================================================================
 subroutine tv(wallheight)
 character :: aa
+real :: wallheight
 print *,"Check finished,type e to exit,type other keys to go to main menu" 
 read *,aa
 if (aa=="e") stop
@@ -124,35 +167,28 @@ subroutine sunDiag(wallheight)
 character :: aa
 real :: latitude
 integer :: i,j
-real , dimension(4,24) :: t1,t2,t3,t4,shadow
+real , dimension(4) :: shadow,angle,delangle
 print *,"type the latitude"
 read *,latitude
-do i=2,4,1
-  do j=1,12,1
-  t1(i,j)=abs((i-3)*23.5+abs(latitude))!deg
-  t2(i,j)=abs((j/24-1/2)*2*3.14159)!rad
-  t3(i,j)=atan(abs(tan(t1(i,j)*3.1415/180))/abs(tan(t2(i,j))))!rad
-  t4(i,j)=atan(cos(t1(i,j)*3.14159/180)/sqrt((cos(t3(i,j))**2)+cos(t1(i,j)*3.1415/180)**2))!rad
-  shadow=sin(t4(i,j))*wallheight
-  t4(i,(24-j))=t4(i,j)!rad
-  t3(i,j)=t3(i,j)*180/3.14159
-  t3(i,(24-j))=t3(i,j)
-  shadow(i,(24-j))=shadow(i,j)
-  end do
-end do
-do j=1,24,1
-  t3(1,j)=t3(3,j)!spring-fall
-  t4(1,j)=t4(3,j)
-  end do
+delangle(1)=0
+delangle(2)=23.5
+delangle(3)=0
+delangle(4)=-23.5
+angle=90-latitude+delangle
+!angle=angle*3.14159/180
+shadow=sin(angle*3.14159/180)*wallheight
 if (latitude<23.5)then
-  print *,"Tropic Zone"
+  print *,"Tropic Zone, this model is less useful as there is always enough sunlight"
   else if (latitude<66.5) then
     print *,"Temperate Zone"
     else
-      print *,"You ain't kidding are you."
+      print *,"Arctic or antarctic, but you ain't kidding are you."
       end if
-print *,t4, "type r to write"
-print *,shadow, "type r to write"
+print *,"	Sping;Summer;Fall;Winter"
+print *,"angle",angle
+print *,"shadow",shadow
+!print *,t4, "type r to write"
+!print *,shadow, "type r to write"
 read *,aa
 !if (aa=="r") then
 !  write("Sunangle.csv"),
