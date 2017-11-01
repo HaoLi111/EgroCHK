@@ -141,8 +141,8 @@ read *,sel1,sel3
 !read *,sel2
 !if (sel2==2) then
 !  call subroutine sunDiag(wallheight)
-  t2=angle(2)
-  t1=angle(4)
+ ! t2=angle(2)
+ ! t1=angle(4)
 !  else
     print *,"winter sun deg:"!deg
     read *,t2
@@ -206,13 +206,13 @@ score2=p2**2*(dv2-d)**2+p1**2*(dv1-d)**2
 print *,"type in the ratio you would like for tv diagonal: watching distance, type 0 for default(1/3)"
 read *,ss
 if (ss<0.00001) then
-  ss=1/3
+  ss=1.0/3.0
   end if
 tvdiag=ss*d
 print *,"type in the ratio of tv; type 0 for default (16:9)"
 read *,tvrat
 if (tvrat<0.00001) then
-  tvrat=(16/9)
+  tvrat=(16.0/9.0)
   end if
 x=tvrat*y
 y=sqrt(tvdiag**2/(tvrat**2+1))
