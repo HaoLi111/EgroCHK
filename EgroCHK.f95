@@ -1,6 +1,6 @@
 program EgroCHK
 character :: f
-real :: wallheight,sofaWidth,latitute
+real :: wallheight,sofawidth,latitute
 print *,"=====         ///// |_| |/"
 print *,"=====/\ |/ /\ \\\\\ | | |\"
 print *,"=====\| |  \/"
@@ -11,6 +11,7 @@ print *,"https://github.com/HaoLi111/EgroCHK/tree/Built-executable"
 print *,"k (kitchen check);w (window sunlight design);t (tv and living room dimensions);a (sun angle calculation)"
 !load default value
 wallheight=2.45
+sofawidth=0.7
 !main panel modifying environmental variables an dcalling subsequences and functions
 do
  print *,"type ? for help; p for a list of program you can run,s for settings,e to exit"
@@ -30,13 +31,22 @@ if (f=="?") then
        print *,"invalid wall height, reset to default"
        wallheight=2.45
    end if
-   print *,"setup: chain&sofa width: type in "
+   print *,"setup: chain&sofa width: type in 0 for default"
+   read *,sofawidth
+   if (abs(sofawidth)<=0.000001) then
+     sofawidth=0.7
+     print *,"set to default"
+   else if (sofawidtht<(-0.000001)) then
+       print *,"invalid sofa width, reset to default"
+       wallheight=0.7
+   end if
+   print *,"wall height=",wallheight,";sofa&chair width=",sofawidth
  else if(f=="k") then
    call kitchenCheck()
  else if (f=="w") then
    call windowCalc(wallheight)
  else if (f=="t") then
-   call tv(wallheight)
+   call tv(wallheight,sofawidth)
  else if (f=="a") then
    call sunDiag(wallheight)
  end if
@@ -81,7 +91,7 @@ if (tp==2) then
   c=sqrt((y1-y2)**2+(x1-x2)**2)
   end if
 print *,"(a,b,c)=(",a,",",b,",",c,")"
-if ((a+b)<=c .or. abs(a-b)<=c) then
+if ((a+b)<=c .or. abs(a-b)>=c) then
   print *,"not a triangle"
   else
 sa=1.95-a
@@ -120,11 +130,11 @@ end subroutine kitchenCheck
 subroutine windowCalc(wallheight)
 character :: aa
 real :: t1,t2,wallheight,yup,ylow,yw,yea,yeafromwall,x
-integer :: sel1,sel2,sel3
+integer :: sel1
 print *,"Select input mode 1"
 print *,"1 .Calculate ease from window"
 print *,"2 .Calculate window from ease"
-read *,sel1
+read *,sel1,sel3
 !print *,"Select imput mode 2"
 !print *,"1.Calculate from known sun angle"
 !print *,"2.Calculate from latitute"
@@ -155,9 +165,61 @@ read *,aa
 if (aa=="e") stop
 end subroutine windowCalc
 !===============================================================================
-subroutine tv(wallheight)
+subroutine tv(wallheight,sofawidth)
 character :: aa
-real :: wallheight
+real :: wallheight,sofawidth,h1,h2,d1,d2,d,ss,score1,score2,p1,p2,h,ho,dv1,dv2,x,y,tvrat,tvdiag
+integer :: i,h1i,h2i,sel1
+print *,"frequency of watching while sitting(0~1)"
+read *,p1
+p2=1-p1
+print *,"Use default human figure?	0 for yes;	 1 for no"
+read *,sel1
+if (sel1==0) then
+  h1i=1192!((819+444)+(738+383))/2
+  h2i=1799
+  else
+    print *,"Enter h1(Standing Viewpoint),h2(Sitting Viewpoint) in order in MM"
+    read *,h1i
+    read *,h2i
+    end if
+h2=h2i/1000
+h1=h1i/1000
+print *,"Enter room depth"
+read *,d2
+d1=d2-sofawidth
+score1=d2**2
+do i = h1i,h2i
+  ss=p1*p1*atan((h11-i)/d1/1000)**2+p2*p2*atan((h2i-i)/d2/1000)**2
+  if (ss<score1) then
+    score1=ss
+    ho=i
+    ho=ho/1000
+   !else
+     !print *,"checking",i,"mm"
+  end if
+end do
+print *,"The center of the tv is", (wallheight-ho),"from top,",ho,"from floor"
+dv1=sqrt(d1**2+(h-h1)**2)
+dv2=sqrt(d2**2+(h-h2)**2)
+d=(dv1*p1**2+dv2*p2**2)/(p1**2+p2**2)
+score2=p2**2*(dv2-d)**2+p1**2*(dv1-d)**2
+print *,"type in the ratio you would like for tv diagonal: watching distance, type 0 for default(1/3)"
+read *,ss
+if (ss<0.00001) then
+  ss=1/3
+  end if
+tvdiag=ss*d
+print *,"type in the ratio of tv; type 0 for default (16:9)"
+read *,tvrat
+if (tvrat<0.00001) then
+  tvrat=(16/9)
+  end if
+x=tvrat*y
+y=sqrt(tvdiag**2/(tvrat**2+1))
+print *,"Input review: TV ratio",tvrat,"watching ratio",ss,"The following are your tv results"
+print *,"TV size diagonal:",tvdiag,"m","",(tvdiag/2.45),"in;",x,"m in length;",y,"in height placed centre",h,":upper rim is"
+print *,(wallheight-(h+y/2)),"from top","lower rim is",h-y/2
+print *,"from ground, head tilting consistency is",score1,"distance consistency is",score2,"weighted average distance",d
 print *,"Check finished,type e to exit,type other keys to go to main menu" 
 read *,aa
 if (aa=="e") stop
