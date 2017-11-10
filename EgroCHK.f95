@@ -126,15 +126,15 @@ read *,aa
 if (aa=="e") stop
 !end do   
 end subroutine kitchenCheck
-!===============================================================================
+!=======================================================================================
 subroutine windowCalc(wallheight)
 character :: aa
-real :: t1,t2,wallheight,yup,ylow,yw,yea,yeafromwall,x
+real :: wallheight,ye,xe,ywl,ywu,tw,ts
 integer :: sel1
 print *,"Select input mode 1"
 print *,"1 .Calculate ease from window"
 print *,"2 .Calculate window from ease"
-read *,sel1,sel3
+read *,sel1
 !print *,"Select imput mode 2"
 !print *,"1.Calculate from known sun angle"
 !print *,"2.Calculate from latitute"
@@ -145,20 +145,33 @@ read *,sel1,sel3
  ! t1=angle(4)
 !  else
     print *,"winter sun deg:"!deg
-    read *,t2
+    read *,tw
     print *,"Summer sun deg"
-    read *,t1
+    read *,ts
  !   end if
-t2=t2*3.14159/180!rad
-t1=t1*3.14159/180!rad
+tw=tw*3.14159/180!rad
+ts=ts*3.14159/180!rad
 if (sel1==1) then !e from w
-  print *,"ylow="
-  print *,"All height wirh respect to"
-  print *,"1.	ground"
-  print *,"2.	walltip"
-  read *,sel3
-  if (sel3==1) then!ground->wall tip
-    end if
+  !print *,"ylow="
+  !print *,"All height wirh respect to"
+  !print *,"1.	ground"
+  !print *,"2.	walltip"
+  !read *,sel3
+  print *,"Yw.u="
+  read *,ywu
+  print *,"Yw.l="
+  read *,ywl  
+  xe=(ywu-ywl)/(tan(ts)-tan(tw))
+  ye=tan(tw)*xe-wallheight+ywu
+  print *,"Xe=",xe,"Ye=",ye
+else if (sel1==2) then !w from e
+  print *,"Xe="
+  read *,xe
+  print *,"Ye="
+  read *,ye
+  ywu=ye+wallheight-xe*tan(tw)
+  ywl=ywu-(tan(ts)-tan(tw))*xe
+  print *,"Yw.u=",ywu,"Yw.l=",ywl
 end if
 print *,"Check finished,type e to exit,type other keys to go to main menu" 
 read *,aa
@@ -167,7 +180,7 @@ end subroutine windowCalc
 !===============================================================================
 subroutine tv(wallheight,sofawidth)
 character :: aa
-real :: wallheight,sofawidth,h1,h2,d1,d2,d,ss,score1,score2,p1,p2,h,ho,dv1,dv2,x,y,tvrat,tvdiag
+real :: wallheight,sofawidth,h1,h2,d1,d2,d,ss,ss2,score1,score2,p1,p2,h,ho,dv1,dv2,x,y,tvrat,tvdiag
 integer :: i,h1i,h2i,sel1
 print *,"frequency of watching while sitting(0~1)"
 read *,p1
@@ -204,19 +217,19 @@ dv2=sqrt(d2**2+(h-h2)**2)
 d=(dv1*p1**2+dv2*p2**2)/(p1**2+p2**2)
 score2=p2**2*(dv2-d)**2+p1**2*(dv1-d)**2
 print *,"type in the ratio you would like for tv diagonal: watching distance, type 0 for default(1/3)"
-read *,ss
-if (ss<0.00001) then
-  ss=1.0/3.0
+read *,ss2
+if (ss2<0.00001) then
+  ss2=1.0/3.0
   end if
-tvdiag=ss*d
+tvdiag=ss2*d
 print *,"type in the ratio of tv; type 0 for default (16:9)"
 read *,tvrat
 if (tvrat<0.00001) then
   tvrat=(16.0/9.0)
   end if
-x=tvrat*y
 y=sqrt(tvdiag**2/(tvrat**2+1))
-print *,"Input review: TV ratio",tvrat,"watching ratio",ss,"The following are your tv results"
+x=tvrat*y
+print *,"Input review: TV ratio",tvrat,"watching ratio",ss2,"The following are your tv results"
 print *,"TV size diagonal:",tvdiag,"m","",(tvdiag/2.45),"in;",x,"m in length;",y,"in height placed centre",h,":upper rim is"
 print *,(wallheight-(h+y/2)),"from top","lower rim is",h-y/2
 print *,"from ground, head tilting consistency is",score1,"distance consistency is",score2,"weighted average distance",d
